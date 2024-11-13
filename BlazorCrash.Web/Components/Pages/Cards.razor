@@ -1,0 +1,89 @@
+﻿@page "/Cards"
+@rendermode InteractiveServer
+@using BlazorCrash.Web.SharedComponents
+
+<h3 class="text-primary">Cards</h3>
+<p>Clicked Product: @_selectedProduct?.Id, @_selectedProduct?.Name , @_selectedProduct?.Price status: @_isClicked</p>
+<p>Favorite Products: @_favourites.Count</p>
+
+@if (_products == null || !_products.Any())
+{
+    <p>No products available.</p>
+}
+else
+{
+    @foreach (var product in _products)
+    {
+        <Card Product="product"
+              OnCardClick="CardClicked"
+              OnFavoriteClick="FavoriteCard" />
+    }
+}
+
+@code {
+    public List<Product> _products = new();
+    private List<int> _favourites = new();
+    private bool _isClicked = false;
+    private Product? _selectedProduct;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var product1 = new Product()
+            {
+                Id = 1,
+                isActive = true,
+                Name = "Product 1",
+                Price = 1.00M,
+                Image = "https://th.bing.com/th/id/OIP.yuIhGQGVmD9pCQd22TKOWAHaHd?rs=1&pid=ImgDetMain",
+                ProductProps = new List<ProductProps>
+            {
+                new ProductProps { Key = "Prop 1A", Value = "Value 1A" },
+                new ProductProps { Key = "Prop 2A", Value = "Value 2A" }
+            }
+            };
+        var product2 = new Product()
+            {
+                Id = 2,
+                isActive = true,
+                Name = "Product 2",
+                Price = 1.5M,
+                Image = "https://www.myredboxx.com/wp-content/uploads/2020/09/DSC5991-1-scaled.jpg",
+                ProductProps = new List<ProductProps>
+            {
+                new ProductProps { Key = "Prop 1B", Value = "Value 1B" },
+                new ProductProps { Key = "Prop 2B", Value = "Value 2B" }
+            }
+            };
+        _products.Add(product1);
+        _products.Add(product2);
+    }
+
+    private void CardClicked((Product Product, bool IsClicked) tuple)
+    {
+        Console.WriteLine($"Card clicked: {tuple.Product.Name}"); // Add logging
+        _selectedProduct = tuple.Product;
+        _isClicked = tuple.IsClicked;
+        StateHasChanged();
+    }
+
+    private void FavoriteCard((int id, bool clicked) obj)
+    {
+        Console.WriteLine($"Favorite clicked: {obj.id}, Status: {obj.clicked}"); // Add logging
+        if (obj.clicked)
+        {
+            if (!_favourites.Contains(obj.id))
+            {
+                _favourites.Add(obj.id);
+            }
+        }
+        else
+        {
+            if (_favourites.Contains(obj.id))
+            {
+                _favourites.Remove(obj.id);
+            }
+        }
+        StateHasChanged();
+    }
+}

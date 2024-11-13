@@ -1,0 +1,65 @@
+﻿@using BlazorCrash.Web.Models
+@using BlazorCrash.Web.SharedComponents
+@using Microsoft.AspNetCore.Components.Web
+<div class="card m-3" style="width: 18rem;">
+    <img src="@Product.Image" class="card-img-top" alt="@Product.Name">
+    <div class="card-body">
+        <h5 class="card-title">@Product.Name</h5>
+        <p class="card-text">Price: $@Product.Price</p>
+        @if (Product.ProductProps != null)
+        {
+            @foreach (var prop in Product.ProductProps)
+            {
+                <p>@prop.Key: @prop.Value</p>
+            }
+        }
+        <button type="button" class="btn btn-primary" onclick="@HandleClick">
+            Select
+        </button>
+        <button type="button"
+                class="btn @(IsFavorite ? "btn-danger" : "btn-outline-danger")"
+                onclick="@HandleFavoriteClick">
+            @(IsFavorite ? "Remove from Favorites" : "Add to Favorites")
+        </button>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public required Product Product { get; set; }
+    [Parameter]
+    public EventCallback<(Product, bool)> OnCardClick { get; set; }
+    [Parameter]
+    public EventCallback<(int id, bool clicked)> OnFavoriteClick { get; set; }
+    private bool IsFavorite { get; set; }
+
+    private async Task HandleClick(MouseEventArgs e)
+    {
+        try
+        {
+            if (OnCardClick.HasDelegate)
+            {
+                await OnCardClick.InvokeAsync((Product, true));
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in HandleClick: {ex.Message}");
+        }
+    }
+
+    private async Task HandleFavoriteClick(MouseEventArgs e)
+    {
+        try
+        {
+            IsFavorite = !IsFavorite;
+            if (OnFavoriteClick.HasDelegate)
+            {
+                await OnFavoriteClick.InvokeAsync((Product.Id, IsFavorite));
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in HandleFavoriteClick: {ex.Message}");
+        }
+    }
+}
