@@ -1,0 +1,78 @@
+﻿@page "/learnBlazor/BindProp"
+@rendermode InteractiveServer
+@using BlazorCrash.Web.Models
+
+<div class="row">
+    <div class="col-6 border-1 p-5">
+        <h3 class="text-primary">One way data binding</h3>
+        <p><strong>Product Name:</strong> @_product.Name</p>
+        <p><strong>Is Active:</strong> @(_product.isActive ? "Active" : "Inactive")</p>
+        <p>Active checkbox: <input type="checkbox" @bind="@_product.isActive" /></p>
+        <p>Product Property: </p>
+        <select @bind="@_selectedProductPropKey">
+            @foreach (var prop in _product.ProductProps)
+            {
+                <option value="@prop.Key">@prop.Key</option>
+            }
+        </select>
+        @if (!string.IsNullOrEmpty(_selectedProductPropKey))
+        {
+            <p><strong>Value:</strong> @_product.ProductProps.FirstOrDefault(p => p.Key == _selectedProductPropKey)?.Value</p>
+        }
+    </div>
+    <div class="col-6 border-1 p-5">
+        <h3 class="text-primary">Simple Two way data binding</h3>
+        <div>
+            <p><strong>Price:</strong> @_product.Price</p>
+            <p>Bind price:<input type="number" @bind="@_product.Price" /></p>
+            <p>Active checkbox: <input type="checkbox" @bind-value="@_product.isActive" checked="@(_product.isActive ? "checked" : null)" /></p>
+        </div>
+    </div>
+</div>
+
+<hr />
+<div class="row">
+    <div class="col-6 border-1 p-5">
+        <h3 class="text-primary">Immediate Two way data binding</h3>
+        <div>
+            <p><strong>Price:</strong> @_product.Price</p>
+            <p>Bind price:<input type="number" @bind="@_product.Price" @bind:event="oninput" /></p>
+        </div>
+    </div>
+    <div class="col-6 border-1 p-5">
+        <h3 class="text-primary">Two way data binding with Method</h3>
+        <div>
+            <p><strong>Price:</strong> @_product.Price</p>
+            <p>
+                Bind price:<input type="number" value="@_product.Price" @oninput="@((e) => OnPriceChange(e))" />
+            </p>
+        </div>
+    </div>
+</div>
+
+
+
+@code {
+    private string _selectedProductPropKey = "Prop 1";
+
+    private Product _product = new()
+        {
+            Name = "Product 1",
+            isActive = true,
+            Price = 1.00M,
+            ProductProps = new List<ProductProps>
+            {
+                new ProductProps { Key = "Prop 1", Value = "Value 1" },
+                new ProductProps { Key = "Prop 2", Value = "Value 2" }
+            }
+        };
+
+    private void OnPriceChange(ChangeEventArgs e)
+    {
+        if (decimal.TryParse(e.Value?.ToString(), out decimal newPrice))
+        {
+            _product.Price = newPrice;
+            StateHasChanged();
+        }
+    }
+}

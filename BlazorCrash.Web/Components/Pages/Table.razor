@@ -1,0 +1,122 @@
+﻿@page "/learnBlazor/Table"
+@rendermode InteractiveServer
+
+<h3 class="text-primary">Table</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Select</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Properties</th>
+            <th>Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < _products.Count; i++)
+        {
+            var product = _products[i];
+            <tr>
+                <td>
+                    <input type="radio" name="selectedProduct" @onclick="() => SelectProduct(product)" />
+                </td>
+                <td>
+                    <input type="text" @bind="product.Name" class="form-control" />
+                </td>
+                <td>
+                    <input type="number" @bind="product.Price" class="form-control" />
+                </td>
+                <td>
+                    <select class="form-select">
+                        @foreach (var prop in product.ProductProps)
+                        {
+                            <option>@prop.Key: @prop.Value</option>
+                        }
+                    </select>
+                </td>
+                <td>
+                    <input type="checkbox" @bind="product.isActive" />
+                </td>
+                <td>
+                    <button class="btn btn-danger" @onclick="() => DeleteProduct(product.Name)">Delete</button>
+                    @if (i == _products.Count - 1)
+                    {
+                        <button class="btn btn-success" @onclick="AddNewProduct">+</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (_selectedProduct != null)
+{
+    <div class="mt-3">
+        <h4>Selected Product Summary</h4>
+        <p>Name: @_selectedProduct.Name, Price: @_selectedProduct.Price, Active: @_selectedProduct.isActive</p>
+    </div>
+}
+
+@code {
+    private List<Product> _products = new();
+    private Product _selectedProduct;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var product1 = new Product()
+        {
+            isActive = true,
+            Name = "Product 1",
+            Price = 1.00M,
+            ProductProps = new List<ProductProps>
+            {
+                new ProductProps { Key = "Prop 1A", Value = "Value 1A" },
+                new ProductProps { Key = "Prop 2A", Value = "Value 2A" }
+            }
+        };
+
+        var product2 = new Product()
+        {
+            isActive = true,
+            Name = "Product 2",
+            Price = 1.5M,
+            ProductProps = new List<ProductProps>
+            {
+                new ProductProps { Key = "Prop 1B", Value = "Value 1B" },
+                new ProductProps { Key = "Prop 2B", Value = "Value 2B" }
+            }
+        };
+
+        _products.Add(product1);
+        _products.Add(product2);
+    }
+
+    private void SelectProduct(Product product)
+    {
+        _selectedProduct = product;
+    }
+
+    private void DeleteProduct(string productName)
+    {
+        var product = _products.FirstOrDefault(p => p.Name == productName);
+        if (product != null)
+        {
+            _products.Remove(product);
+        }
+    }
+
+    private void AddNewProduct()
+    {
+        var newProduct = new Product
+        {
+            isActive = false,
+            Name = "New Product",
+            Price = 0.0M,
+            ProductProps = new List<ProductProps>()
+        };
+        _products.Add(newProduct);
+    }
+}
