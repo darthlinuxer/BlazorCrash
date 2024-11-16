@@ -1,0 +1,44 @@
+﻿@using BlazorCrash.Web.Services
+@using Microsoft.JSInterop
+@using BlazorCrash.Web.Extensions;
+
+@inject IJSRuntime JSRuntime
+@inject MessageService MessageService
+
+<div class="p-3 m-1" style="background-color: yellow;">
+    <br />
+    <h3>GrandChild</h3>
+    <p>Cascaded message from Grandpa: @Message @Number hours</p>
+    <br />
+</div>
+
+@code {
+    [CascadingParameter(Name = "Message")]
+    public string Message { get; set; }
+
+    [CascadingParameter(Name = "Number")]
+    public int Number { get; set; }
+
+    public async Task ToastSuccess(string message)
+    {
+        await JSRuntime.ToastrSuccess(message);
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        MessageService.SendMessage("GrandChild - OnInitialized");
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        MessageService.SendMessage("GrandChild - OnInitializedAsync");
+        return base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        MessageService.SendMessage("GrandChild - OnParameterSet");
+    }
+}

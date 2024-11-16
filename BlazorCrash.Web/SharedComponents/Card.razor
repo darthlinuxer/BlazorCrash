@@ -1,7 +1,14 @@
 ﻿@using BlazorCrash.Web.Models
 @using Microsoft.AspNetCore.Components.Web
 
-<div class="card m-3" style="width: 18rem;">
+
+<div class="card m-3" style="width: 18rem;" @onclick="args => HandleClick(args)">
+    <div>
+        @if (HeaderContent != null)
+        {
+            @HeaderContent
+        }
+    </div>
     <img src="@Product.Image" class="card-img-top" alt="@Product.Name">
     <div class="card-body">
         <h5 class="card-title">@Product.Name</h5>
@@ -22,14 +29,20 @@
             @(IsFavorite ? "Remove from Favorites" : "Add to Favorites")
         </button>
     </div>
+    <div>
+        @if (FooterContent != null)
+        {
+            @FooterContent
+        }
+    </div>
 </div>
 @code {
-    [Parameter]
-    public required Product Product { get; set; }
-    [Parameter]
-    public EventCallback<(Product, bool)> OnCardClick { get; set; }
-    [Parameter]
-    public EventCallback<(int id, bool clicked)> OnFavoriteClick { get; set; }
+    [Parameter] public required Product Product { get; set; }
+    [Parameter] public EventCallback<(Product, bool)> OnCardClick { get; set; }
+    [Parameter] public EventCallback<(int id, bool clicked)> OnFavoriteClick { get; set; }
+    [Parameter] public RenderFragment HeaderContent { get; set; }
+    [Parameter] public RenderFragment FooterContent { get; set; }
+
     private bool IsFavorite { get; set; }
 
     private async Task HandleClick(MouseEventArgs e)

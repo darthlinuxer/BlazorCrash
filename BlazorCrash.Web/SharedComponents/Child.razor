@@ -1,0 +1,33 @@
+﻿@using BlazorCrash.Web.Services
+@inject MessageService MessageService
+
+<div class="p-3 m-1" style="background-color: greenyellow;">
+    <h3>Child</h3>
+    <br />
+    <GrandChild @ref="_grandChild"></GrandChild>
+    <button class="btn btn-success m-2" onclick="@(()=>_grandChild.ToastSuccess("Hello from Child"))">Child calling Grandchild Toast</button>
+    <br />
+</div>
+
+@code {
+    public GrandChild _grandChild { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        MessageService.SendMessage("Child - OnInitialized");
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        MessageService.SendMessage("Child - OnInitializedAsync");
+        return base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        MessageService.SendMessage("Child - OnParameterSet");
+    }
+
+}

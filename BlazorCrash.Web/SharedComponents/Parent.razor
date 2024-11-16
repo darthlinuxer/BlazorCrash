@@ -1,0 +1,60 @@
+﻿@using BlazorCrash.Web.Services
+@inject MessageService MessageService
+@implements IDisposable
+
+<div class="p-3 m-1" style="background-color: deepskyblue;">
+    <h3>Parent</h3>
+    <br />
+    <CascadingValue Name="Message" Value="@MessageToGrandson">
+        <CascadingValue Name="Number" Value="@Hour">
+            <Child @ref="_child">
+            </Child>
+        </CascadingValue>
+    </CascadingValue>
+    <button class="btn btn-success m-2" onclick="@(()=>_child._grandChild.ToastSuccess("Hello from Parent"))">Parent calling Grandchild Toast</button>
+    <br />
+</div>
+<div class="border">
+    @foreach(var message in _messages){
+        <p>@message</p>
+    }
+</div>
+
+@code {
+    private Child _child { get; set; }
+    private string MessageToGrandson { get; set; } = "Meet me at the park at ";
+    private int Hour { get; set; } = 18;
+    private List<string> _messages = new();
+    private int counter = 0;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        HandleMessage($"Parent - OnInitialized ");
+        MessageService.OnMessageReceived += HandleMessage;
+    }
+
+    protected override Task OnInitializedAsync()
+    {
+        HandleMessage($"Parent - OnInitializedAsync ");
+        return base.OnInitializedAsync();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        HandleMessage($"Parent - OnParametersSet ");
+    }
+
+    private void HandleMessage(string message)
+    {
+        message = $"{counter++}: {message}"; 
+        _messages.Add(message);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        MessageService.OnMessageReceived -= HandleMessage;
+    }
+}

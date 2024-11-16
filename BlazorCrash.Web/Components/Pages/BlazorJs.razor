@@ -1,0 +1,38 @@
+﻿@page "/BlazorJs"
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+<h3>BlazorJs</h3>
+
+<button class="btn btn-primary" @onclick="TestBox">Click Me</button>
+
+<h4>How to add Toastr.js to Blazor</h4>
+<p>To add Toastr.js to your Blazor project, follow these steps:</p>
+<ol>
+    <li>Include the CDN links in your <code>App.razor</code> file.</li>
+    <li>Add the Toastr.js CSS in the head of App.razor</li>
+    <li>Use the <code>InvokeVoidAsync</code> method to call Toastr.js functions from your Blazor component.</li>
+    <li>Don´t forget to import your own scripts if you are creating custom javascript functions in <code>App.razor</code></li>
+</ol>
+<button class="btn btn-success m-2" @onclick="Success">Toastr Success</button>
+<button class="btn btn-success m-2" @onclick="@(()=>JSRuntime.ToastrSuccess("Toastr Success from Extension methods"))">Toastr Success2</button>
+<button class="btn btn-danger m-2" @onclick="Error">Toastr Error</button>
+<button class="btn btn-danger m-2" @onclick="@(()=>JSRuntime.ToastrError("Toastr Error from Extension methods"))">Toastr Error2</button>
+
+<h4>SweetAlert2 Examples</h4>
+<button class="btn btn-info m-2" @onclick="@(() => JSRuntime.InvokeVoidAsync("Swal.fire", "Info", "This is an info alert", "info"))">Info Alert</button>
+<button class="btn btn-warning m-2" @onclick="@(() => JSRuntime.InvokeVoidAsync("Swal.fire", "Warning", "This is a warning alert", "warning"))">Warning Alert</button>
+<button class="btn btn-success m-2" @onclick="@(() => JSRuntime.InvokeVoidAsync("Swal.fire", "Success", "This is a success alert", "success"))">Success Alert</button>
+<button class="btn btn-danger m-2" @onclick="@(() => JSRuntime.InvokeVoidAsync("Swal.fire", "Error", "This is an error alert", "error"))">Error Alert</button>
+
+@code {
+    private string _message = "Are you sure you want to click this?";
+
+    private async Task TestBox()
+    {
+        var result = await JSRuntime.InvokeAsync<bool>("confirm", _message);
+        await JSRuntime.InvokeVoidAsync("alert", $"You clicked: {result}");
+    }
+
+    private async Task Success() => await JSRuntime.InvokeVoidAsync("showtoastr", "success","This is a Successful toaster!");
+    private async Task Error() => await JSRuntime.InvokeVoidAsync("showtoastr", "error", "hmm.. error toaster!");
+}

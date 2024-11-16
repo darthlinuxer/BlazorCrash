@@ -1,5 +1,6 @@
 using BlazorCrash.Web;
 using BlazorCrash.Web.Components;
+using BlazorCrash.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,8 @@ builder.Services.AddHttpClient<WeatherApiClient>(client =>
         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
         client.BaseAddress = new("https+http://apiservice");
     });
+
+builder.Services.AddSingleton<MessageService>();
 
 var app = builder.Build();
 

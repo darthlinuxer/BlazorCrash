@@ -1,0 +1,70 @@
+﻿@page "/learn-routes"
+@page "/learn-routes/{param1:int}"
+@page "/learn-routes/{param1:int}/{param2:int}"
+@page "/learn-routes/catch-all/{*parameters}"
+@rendermode InteractiveServer
+@inject NavigationManager _navigationManager
+
+Try this on the Routes:
+<p>"/learn-routes"</p>
+<p>"/learn-routes/{param1:int}"</p>
+<p>"/learn-routes/{param1:int}/{param2:int}"</p>
+<p>"/learn-routes/catch-all/{*parameters}"</p>
+<p>"/learn-routes?param1=2/&amp;param2=4"</p>
+<br/>
+<h3>Parsed Parameters</h3>
+<p>Param1: @Param1</p>
+<p>Param2: @Param2</p>
+<p>Param3: @Param3</p>
+<p>Params: @Parameters</p>
+<br/>
+<button class="btn btn-primary" @onclick="ParseQuery">Parse Query Parameters</button>
+<button class="btn btn-secondary" @onclick="@(() => _navigationManager.NavigateTo("learn-routes?param1=10"))">Param1=10 Navigation example</button>
+<button class="btn btn-secondary" @onclick="@(() => _navigationManager.NavigateTo("learn-routes?param1=15&param2=5"))">Param1=15 Param2=5 Navigation example</button>
+<button class="btn btn-secondary" @onclick="@(() => _navigationManager.NavigateTo("learn-routes?parameters=hello world"))">Parameters=hello world Navigation example</button>
+<button class="btn btn-secondary" @onclick="@(() => _navigationManager.NavigateTo("learn-routes?param3=hello world"))">Param3=hello automatically from query</button>
+
+<br/>
+<NavLink class="nav-link" href="/learn-routes#targetElementId">
+    Go to Element
+</NavLink>
+
+<div class="bg-info" style="height:1000px"></div>
+<p id="targetElementId">Hello from Element ! Routing to component works!</p>
+
+@code {
+    [Parameter]
+    public int Param1 { get; set; }
+    [Parameter]
+    public int Param2 { get; set; }
+    [Parameter]
+    public string? Parameters { get; set; }
+    [SupplyParameterFromQuery(Name = "param3")]
+    public string? Param3 { get; set; }
+
+    private void ParseQuery()
+    {
+        try
+        {
+            Console.WriteLine("ParseQuery called...");
+            var uri = new Uri(_navigationManager.Uri);
+            var query = uri.Query;
+            Console.WriteLine(query);
+            var queryDictionary = System.Web.HttpUtility.ParseQueryString(query);
+            if (int.TryParse(queryDictionary["param1"], out var param1))
+            {
+                Param1 = param1;
+            }
+            if (int.TryParse(queryDictionary["param2"], out var param2))
+            {
+                Param2 = param2;
+            }
+            Parameters = queryDictionary["parameters"] ?? string.Empty;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+}

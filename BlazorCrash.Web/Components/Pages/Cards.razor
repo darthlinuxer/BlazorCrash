@@ -1,24 +1,39 @@
 ﻿@page "/Cards"
 @rendermode InteractiveServer
-@using BlazorCrash.Web.SharedComponents
 
-<h3 class="text-primary">Cards</h3>
-<p>Clicked Product: @_selectedProduct?.Id, @_selectedProduct?.Name , @_selectedProduct?.Price status: @_isClicked</p>
-<p>Favorite Products: @_favourites.Count</p>
+<div class="container-fluid">
+    <h3 class="text-primary">Cards</h3>
+    <p>Clicked Product: @_selectedProduct?.Id, @_selectedProduct?.Name , @_selectedProduct?.Price status: @_isClicked</p>
+    <p>Favorite Products: @_favourites.Count</p>
 
-@if (_products == null || !_products.Any())
-{
-    <p>No products available.</p>
-}
-else
-{
-    @foreach (var product in _products)
+    @if (_products == null || !_products.Any())
     {
-        <Card Product="product"
-              OnCardClick="CardClicked"
-              OnFavoriteClick="FavoriteCard" />
+        <p>No products available.</p>
     }
-}
+    else
+    {
+        <div class="row g-4">
+            @foreach (var product in _products)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card-wrapper">
+                        <Card Product="product"
+                              OnCardClick="CardClicked"
+                              OnFavoriteClick="FavoriteCard">
+                            <HeaderContent>
+                                <div class="alert alert-primary">Card has header</div>
+                            </HeaderContent>  
+                            <FooterContent>
+                                <div class="alert alert-success">Card has footer</div>
+                            </FooterContent>
+
+                        </Card>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
 
 @code {
     public List<Product> _products = new();
